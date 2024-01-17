@@ -20,6 +20,10 @@ module.exports = function (app) {
 
       // Handle scenarios for multiple stocks
       if (Array.isArray(stock)) {
+        if (stock.length !== 2) {
+          return res.json({ error: 'Invalid number of stocks provided' });
+        }
+
         // Fetch data for each stock
         const stockDataPromises = stock.map(async (symbol) => {
           const stockData = await getStockData(symbol);
@@ -42,12 +46,19 @@ module.exports = function (app) {
           return {
             stock: stockData.symbol,
             price: stockData.latestPrice,
-            rel_likes: stockRecord.likes.length,
+            likes: stockRecord.likes.length,
           };
         });
 
         // Wait for all promises to resolve
         const stockDataArray = await Promise.all(stockDataPromises);
+
+        // Calculate rel_likes for the two stocks
+        const rel_likes = stockDataArray[0].likes - stockDataArray[1].likes;
+
+        // Update the response with rel_likes
+        stockDataArray[0].rel_likes = rel_likes;
+        stockDataArray[1].rel_likes = -rel_likes;
 
         // Send the response
         return res.json({ stockData: stockDataArray });
