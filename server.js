@@ -43,12 +43,11 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts (for example, in HTML attributes)
+      styleSrc: ["'self'", "'unsafe-inline'"],  // Allow inline styles (for example, in style attributes)
     },
   })
 );
-
 
 
 // Connect to MongoDB
